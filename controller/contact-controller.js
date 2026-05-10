@@ -9,7 +9,7 @@ const contactController = {};
 
 contactController.getContacts = async function (req, res) {
     try {
-        const data = await contactModles.getContacts
+        const data = await contactModles.getContacts()
         res.status(200).json(data);
     }catch (err) {
         res.status(500).json({ error: "Failed to fetch contacts" });

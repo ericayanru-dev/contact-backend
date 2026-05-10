@@ -53,7 +53,7 @@ contactModles.insertContact = async function (sampleData) {
 
 contactModles.getContacts = async function () {
     try {
-        const contacts = await connectMongodb.mongoClient()
+        const db = await connectMongodb.mongoClient()
         const data = await db.collection("contacts").find().toArray();
         return data
     }
