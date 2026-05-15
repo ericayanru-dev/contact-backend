@@ -5,11 +5,7 @@
     "description": "API documentation",
     "version": "1.0.0"
   },
-  "host": "localhost:5500/api-docs",
-  "basePath": "/",
-  "schemes": [
-    "http"
-  ],
+  
   "paths": {
     "/contact/{id}": {
       "get": {
