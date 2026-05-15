@@ -4,11 +4,15 @@ const express = require('express');
 const app = express()
 const bodyParser = require("body-parser")
 require("dotenv").config()
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
 const contactRoutes = require("./routes/contactRoutes")
 const connectMongodb = require("./db-connection/mongodb-connection")
-const { insertSampleContacts } = require("./models/contact-model");
+
 
 // middleware
 app.use(bodyParser.json())
@@ -28,7 +32,7 @@ const PORT = process.env.PORT || 8080;
 async function startServer() {
     try {
         const db = await connectMongodb.mongoClient()
-        console.log("DB result:"); // 👈 ADD THIS
+        console.log("DB result:");
 
         if (!db) {
             console.error("No DB connection returned");
@@ -37,7 +41,6 @@ async function startServer() {
         if (db) {
             app.listen(PORT, () => {
                 console.log(` App listening at ${HOST}:${PORT}`);
-                insertSampleContacts()
             });
         }
     }

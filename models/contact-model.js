@@ -4,50 +4,30 @@ const connectMongodb = require("../db-connection/mongodb-connection")
  const { ObjectId } = require("mongodb");
 
 const contactModles = {}
-    
-const sampleContacts = [
-    {
-        firstName: "Rick",
-        lastName: "Ayanru",
-        email: "rick@example.com",
-        favoriteColor: "Blue",
-        birthday: "1995-05-15"
-    },
-    {
-        firstName: "Sarah",
-        lastName: "Johnson",
-        email: "sarah@example.com",
-        favoriteColor: "Green",
-        birthday: "1998-08-22"
-    },
-    {
-        firstName: "Michael",
-        lastName: "Chen",
-        email: "michael@example.com",
-        favoriteColor: "Red",
-        birthday: "1993-11-03"
-    }
-]
 
 contactModles.insertContact = async function (sampleData) {
     try {
-        const db = await connectMongodb.connectMongodb()
-        const data = db.collection("contacts")
+        const db = await connectMongodb.mongoClient()
+        const collection = db.collection("contacts")
 
         // Check if exact data already exists
-        const existingData = data.find({
-        firstName: sampleData.firstName,
-        email: sampleData.email,
+        const existingData = await collection.findOne({
+            firstName: sampleData.firstName,
+            email: sampleData.email,
         })
+
         if (existingData) {
-            console.log("Professional data already exists. Skipping seed.");
-            return;
+            console.log("Contact already exists. Skipping insertion.");
+            return null; 
         }
+
         const result = await collection.insertOne(sampleData);
         console.log("Sample data inserted successfully");
-    return result
+        return result;
+
     } catch (err) {
-        console.log("error inserting data")
+        console.error(" Error inserting data:", err);
+        throw err; 
     }
 }
 
@@ -79,27 +59,37 @@ contactModles.getContactById = async function (contact_id) {
     }
 }
 
-contactModles.insertSampleContacts = async function () {
-    try {
-        const db = await connectMongodb.mongoClient()
-        const collection = db.collection("contacts")
+contactModles.putContact = async function (contact_id, updateData) {
+  try {
+    const db = await connectMongodb.mongoClient()
+    const data = await db.collection("contacts")
+    const result = await data.updateOne(
+      { _id: new ObjectId(contact_id) },
+      { $set: updateData }
+    );
 
-        // Check if data already exists
-        const existingCount = await collection.countDocuments()
+    return result;
 
-        if (existingCount > 0) {
-            console.log(`✅ Database already has ${existingCount} contacts. Skipping insert.`)
-            return
-        }
-
-        // Insert sample data
-        const result = await collection.insertMany(sampleContacts)
-        
-        console.log(`Successfully inserted ${result.insertedCount} sample contacts!`)        
-    } catch (err) {
-        console.error(" Error inserting sample data:", err)
-    }
+  } catch (err) {
+    console.error(" Error fetching contact by ID:", err);
+    throw err;
+  }
 }
 
+contactModles.deleteContact = async function (contact_id) {
+  try {
+    const db = await connectMongodb.mongoClient()
+    const data = await db.collection("contacts")
+    const result = await data.deleteOne(
+      { _id: new ObjectId(contact_id) }
+    );
+
+    return result;
+
+  } catch (err) {
+    console.error(" Error deleting contact ID:", err);
+    throw err;
+  }
+}
 
 module.exports = contactModles
