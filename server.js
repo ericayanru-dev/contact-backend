@@ -4,7 +4,10 @@ const express = require('express');
 const app = express()
 const bodyParser = require("body-parser")
 require("dotenv").config()
+const cors = require("cors");
 const swaggerUi = require('swagger-ui-express');
+
+app.use(cors());
 const swaggerDocument = require('./swagger.json');
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
